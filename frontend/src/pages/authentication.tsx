@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import axios from 'axios';
 import { 
     TextField, Button, CircularProgress, Snackbar, Alert, 
     Avatar, Paper, Box, Grid, Typography, IconButton, InputAdornment,
@@ -9,7 +10,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import { styled } from '@mui/system';
-import { AuthContext } from '../contexts/AuthContext';
+import { AuthContext } from '../contexts/AuthContextDefinition';
 
 const DecorativeBox = styled(Box)({
     position: 'relative',
@@ -44,7 +45,7 @@ const DecorativeBox = styled(Box)({
     }
 });
 
-const Authentication = () => {
+const Authentication: React.FC = () => {
     const [formState, setFormState] = useState(0); // 0 = login, 1 = register
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -57,7 +58,7 @@ const Authentication = () => {
 
     const { handleLogin, handleRegister } = useContext(AuthContext);
 
-    const handleAuth = async (e) => {
+    const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         setLoading(true);
@@ -79,8 +80,14 @@ const Authentication = () => {
                 setName("");
                 setPassword("");
             }
-        } catch (err) {
-            setError(err.response?.data?.message || err.message || "Something went wrong");
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data?.message || err.message || "Something went wrong");
+            } else if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Something went wrong");
+            }
         } finally {
             setLoading(false);
         }
@@ -89,7 +96,7 @@ const Authentication = () => {
     return (
         <Grid container component="main" sx={{ height: '100vh' }}>
             {/* Left Column - Decorative */}
-            <Grid item sm={4} md={7} sx={{ display: { xs: 'none', sm: 'block' } }}>
+            <Grid size={{ sm: 4, md: 7 }} sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <DecorativeBox>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4, zIndex: 1 }}>
                         <VideocamIcon sx={{ fontSize: 60, color: '#FF9839' }} />
@@ -102,7 +109,7 @@ const Authentication = () => {
             </Grid>
 
             {/* Right Column - Form */}
-            <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Grid size={{ xs: 12, sm: 8, md: 5 }} component={Paper} elevation={6} square sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Box sx={{
                     my: 8, mx: 4,
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -117,7 +124,7 @@ const Authentication = () => {
 
                     <Tabs 
                         value={formState} 
-                        onChange={(e, val) => { setFormState(val); setError(""); }} 
+                        onChange={(_, val) => { setFormState(val); setError(""); }} 
                         sx={{ mb: 4, borderBottom: 1, borderColor: 'divider', width: '100%' }}
                         variant="fullWidth"
                     >
@@ -157,14 +164,16 @@ const Authentication = () => {
                             type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton onClick={() => setShowPassword(!showPassword)}>
-                                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                )
+                            slotProps={{
+                                input: {
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={() => setShowPassword(!showPassword)}>
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }
                             }}
                         />
 

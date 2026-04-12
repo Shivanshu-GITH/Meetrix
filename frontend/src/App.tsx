@@ -1,4 +1,5 @@
-import './App.css'
+import React from 'react';
+import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -10,7 +11,7 @@ import HomeComponent from './pages/home';
 import History from './pages/history';
 import { meetrixTheme } from './theme';
 
-function App() {
+const App: React.FC = () => {
   return (
     <ThemeProvider theme={meetrixTheme}>
       <CssBaseline />
@@ -24,7 +25,7 @@ function App() {
               <Route path="/history" element={<History />} />
               <Route path="/meet" element={<Navigate to="/home" replace />} />
               <Route path="/meet/:url" element={<VideoMeetComponent />} />
-              <Route path="/:url" element={<VideoMeetComponent />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </AuthProvider>
         </Router>

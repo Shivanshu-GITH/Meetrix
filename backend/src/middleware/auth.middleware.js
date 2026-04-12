@@ -2,6 +2,11 @@ import jwt from "jsonwebtoken";
 import httpStatus from "http-status";
 
 const verifyToken = async (req, res, next) => {
+    if (!process.env.JWT_SECRET) {
+        console.error("FATAL: JWT_SECRET is not set. Refusing to verify tokens.");
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Server misconfiguration" });
+    }
+
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

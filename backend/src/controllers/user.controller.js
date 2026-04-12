@@ -75,9 +75,6 @@ const login = async (req, res) => {
                 { expiresIn: "7d" }
             );
 
-            user.token = token;
-            await user.save();
-
             return res.status(httpStatus.OK).json({
                 token,
                 username: user.username,
@@ -93,17 +90,22 @@ const login = async (req, res) => {
 
 const getUserHistory = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
-        if (!user) {
-            return res.status(httpStatus.UNAUTHORIZED).json({ message: "User not found" });
+        const username = req.user?.username;
+        if (!username) {
+            return res.status(httpStatus.UNAUTHORIZED).json({ message: "Invalid token payload" });
         }
 
-        const meetings = await Meeting.find({ user_id: user.username });
+        const meetings = await Meeting.find({ user_id: username });
 
         return res.status(httpStatus.OK).json(meetings);
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: `Something went wrong: ${e.message}` });
     }
+};
+
+/** Stateless JWT: client should discard the token. True server-side invalidation needs a blocklist (e.g. Redis) — future enhancement. */
+const logout = async (req, res) => {
+    return res.status(httpStatus.OK).json({ message: "Logged out" });
 };
 
 const addToHistory = async (req, res) => {
@@ -137,4 +139,4 @@ const addToHistory = async (req, res) => {
     }
 };
 
-export { register, login, getUserHistory, addToHistory };
+export { register, login, getUserHistory, addToHistory, logout };

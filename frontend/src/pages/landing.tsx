@@ -30,7 +30,7 @@ const FeatureCard = styled(Card)({
   }
 });
 
-const LandingPage = () => {
+const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleGuestJoin = () => {
@@ -62,7 +62,7 @@ const LandingPage = () => {
       {/* Hero Section */}
       <Container maxWidth="xl">
         <Grid container className="landingMainContainer" spacing={4}>
-          <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+          <Grid size={{ xs: 12, md: 6 }} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
             <Box sx={{ mb: 3, display: 'inline-block', px: 2, py: 0.5, bgcolor: 'rgba(255, 152, 57, 0.15)', borderRadius: '20px', border: '1px solid #FF9839' }}>
               <Typography variant="caption" sx={{ color: '#FF9839', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1 }}>
                 New: HD Video Calls Now Available
@@ -123,7 +123,7 @@ const LandingPage = () => {
             </Typography>
           </Grid>
 
-          <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Box sx={{ 
               position: 'relative',
               p: 2, 
@@ -141,7 +141,7 @@ const LandingPage = () => {
       {/* Features Section */}
       <Container sx={{ py: 10 }}>
         <Grid container spacing={4}>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <FeatureCard>
               <CardContent>
                 <VideocamIcon sx={{ fontSize: 50, color: '#FF9839', mb: 2 }} />
@@ -152,7 +152,7 @@ const LandingPage = () => {
               </CardContent>
             </FeatureCard>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <FeatureCard>
               <CardContent>
                 <LockIcon sx={{ fontSize: 50, color: '#FF9839', mb: 2 }} />
@@ -163,7 +163,7 @@ const LandingPage = () => {
               </CardContent>
             </FeatureCard>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <FeatureCard>
               <CardContent>
                 <ScreenShareIcon sx={{ fontSize: 50, color: '#FF9839', mb: 2 }} />

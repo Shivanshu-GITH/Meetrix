@@ -16,9 +16,6 @@ const userSchema = new Schema(
         password: {
             type: String,
             required: true
-        },
-        token: {
-            type: String
         }
     },
     { timestamps: true }

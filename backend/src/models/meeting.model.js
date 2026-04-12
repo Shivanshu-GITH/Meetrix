@@ -3,7 +3,9 @@ import mongoose, { Schema } from "mongoose";
 const meetingSchema = new Schema(
     {
         user_id: {
-            type: String
+            type: String,
+            required: true,
+            index: true,
         },
         meetingCode: {
             type: String,

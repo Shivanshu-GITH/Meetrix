@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, register, addToHistory, getUserHistory } from "../controllers/user.controller.js";
+import { login, register, addToHistory, getUserHistory, logout } from "../controllers/user.controller.js";
 import { rateLimit } from 'express-rate-limit';
 import { verifyToken } from "../middleware/auth.middleware.js";
 
@@ -17,5 +17,6 @@ router.route("/login").post(authLimiter, login);
 router.route("/register").post(authLimiter, register);
 router.route("/add_to_activity").post(verifyToken, addToHistory);
 router.route("/get_all_activity").get(verifyToken, getUserHistory);
+router.route("/logout").post(verifyToken, logout);
 
 export default router;

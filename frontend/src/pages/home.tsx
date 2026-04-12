@@ -8,7 +8,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import LogoutIcon from '@mui/icons-material/Logout';
 import VideoCallIcon from '@mui/icons-material/VideoCall';
 import { styled, keyframes } from '@mui/system';
-import { AuthContext } from '../contexts/AuthContext';
+import { AuthContext } from '../contexts/AuthContextDefinition';
 import withAuth from '../utils/withAuth';
 
 const float = keyframes`
@@ -23,7 +23,7 @@ const AnimatedImage = styled('img')({
     height: 'auto',
 });
 
-const HomeComponent = () => {
+const HomeComponent: React.FC = () => {
     const navigate = useNavigate();
     const { logout, addToUserHistory } = useContext(AuthContext);
 
@@ -32,27 +32,39 @@ const HomeComponent = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const handleJoinMeeting = async () => {
-        if (!meetingCode.trim()) {
+        const code = meetingCode.trim();
+        if (!code) {
             setError("Meeting code cannot be empty");
+            setSnackbarOpen(true);
+            return;
+        }
+        if (code.length > 64) {
+            setError("Meeting code must be 64 characters or fewer.");
+            setSnackbarOpen(true);
+            return;
+        }
+        if (!/^[a-zA-Z0-9_-]+$/.test(code)) {
+            setError("Meeting code may only contain letters, numbers, hyphens, and underscores.");
             setSnackbarOpen(true);
             return;
         }
 
         try {
-            await addToUserHistory(meetingCode);
-            navigate(`/meet/${meetingCode.trim()}`);
-        } catch (err) {
+            await addToUserHistory(code);
+            navigate(`/meet/${code}`);
+        } catch {
             setError("Failed to join meeting. Please try again.");
             setSnackbarOpen(true);
         }
     };
 
     const handleCreateInstantMeeting = async () => {
+        // Math.random().toString(36) uses radix-36 alphabet [a-z0-9] only — always passes client validation below.
         const generatedCode = Math.random().toString(36).substring(2, 10);
         try {
             await addToUserHistory(generatedCode);
             navigate(`/meet/${generatedCode}`);
-        } catch (err) {
+        } catch {
             setError("Failed to create meeting. Please try again.");
             setSnackbarOpen(true);
         }
@@ -89,8 +101,8 @@ const HomeComponent = () => {
 
             {/* Main Content */}
             <Container maxWidth="lg" sx={{ flex: 1, display: 'flex', alignItems: 'center', py: { xs: 4, md: 8 } }}>
-                <Grid container spacing={6} alignItems="center" justifyContent="center">
-                    <Grid item xs={12} md={6}>
+                <Grid container spacing={6} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <Box sx={{ 
                             textAlign: { xs: 'center', md: 'left' },
                             bgcolor: 'white',
@@ -164,7 +176,7 @@ const HomeComponent = () => {
                         </Box>
                     </Grid>
 
-                    <Grid item xs={12} md={6} sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
+                    <Grid size={{ xs: 12, md: 6 }} sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
                         <Box sx={{ position: 'relative' }}>
                             <Box sx={{ 
                                 position: 'absolute', 
@@ -196,4 +208,5 @@ const HomeComponent = () => {
     );
 };
 
-export default withAuth(HomeComponent);
+const WrappedHome = withAuth(HomeComponent);
+export default WrappedHome;

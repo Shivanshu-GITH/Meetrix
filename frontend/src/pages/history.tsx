@@ -9,13 +9,19 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import HistoryIcon from '@mui/icons-material/History';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
+import { AuthContext } from '../contexts/AuthContextDefinition';
 import withAuth from '../utils/withAuth';
 
-const History = () => {
+interface Meeting {
+    _id?: string;
+    meetingCode: string;
+    date: string;
+}
+
+const History: React.FC = () => {
     const navigate = useNavigate();
     const { getHistoryOfUser, addToUserHistory } = useContext(AuthContext);
-    const [meetings, setMeetings] = useState([]);
+    const [meetings, setMeetings] = useState<Meeting[]>([]);
     const [loading, setLoading] = useState(true);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -23,7 +29,7 @@ const History = () => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const data = await getHistoryOfUser();
+                const data = await getHistoryOfUser() as Meeting[];
                 const list = Array.isArray(data) ? data : [];
                 const sortedData = [...list].sort(
                     (a, b) =>
@@ -39,7 +45,7 @@ const History = () => {
         fetchHistory();
     }, [getHistoryOfUser]);
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -49,13 +55,13 @@ const History = () => {
         return `${day}/${month}/${year} at ${hours}:${minutes}`;
     };
 
-    const handleCopyCode = (code) => {
+    const handleCopyCode = (code: string) => {
         navigator.clipboard.writeText(code);
         setSnackbarMessage("Meeting code copied!");
         setSnackbarOpen(true);
     };
 
-    const handleRejoin = async (code) => {
+    const handleRejoin = async (code: string) => {
         try {
             await addToUserHistory(code);
             navigate(`/meet/${code}`);
@@ -112,7 +118,7 @@ const History = () => {
 
                                 <Grid container spacing={2}>
                                     {meetings.map((meeting, index) => (
-                                        <Grid item xs={12} key={index}>
+                                        <Grid size={12} key={meeting._id ?? index}>
                                             <Card variant="outlined" sx={{ 
                                                 borderRadius: '12px', 
                                                 '&:hover': { boxShadow: 4, transform: 'translateY(-2px)' },
@@ -172,4 +178,5 @@ const History = () => {
     );
 };
 
-export default withAuth(History);
+const WrappedHistory = withAuth(History);
+export default WrappedHistory;

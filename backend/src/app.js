@@ -6,6 +6,10 @@ import 'dotenv/config';
 import { connectToSocket } from './controllers/socketManager.js';
 import userRoutes from './routes/users.routes.js';
 
+if (!process.env.JWT_SECRET) {
+    console.error("WARNING: JWT_SECRET is not set. Auth routes will return 500.");
+}
+
 const skipDb = process.env.SKIP_DB === 'true';
 
 const app = express();
@@ -14,7 +18,11 @@ connectToSocket(server);
 
 app.set("port", (process.env.PORT || 8000));
 
-const corsOrigin = process.env.FRONTEND_URL || true;
+const corsOrigin = process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL
+    : process.env.NODE_ENV === "production"
+    ? (() => { throw new Error("FRONTEND_URL must be set in production"); })()
+    : true; // dev only
 
 app.use(cors({
     origin: corsOrigin,
@@ -45,11 +53,14 @@ app.use((req, res) => {
     res.status(404).json({ message: "Route not found" });
 });
 
-// Global error handler middleware
+// Global error handler (4-arg) — must stay after all routes and the 404 handler
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ 
-        message: err.message || "Internal server error" 
+    const status = err.status || err.statusCode || 500;
+    if (status >= 500) {
+        console.error(err.stack);
+    }
+    res.status(status).json({
+        message: err.message || "Internal server error",
     });
 });
 
