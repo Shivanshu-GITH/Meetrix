@@ -5,7 +5,6 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-6-blue?logo=typescript)](https://www.typescriptlang.org)
 [![Socket.IO](https://img.shields.io/badge/Socket.IO-4.x-black?logo=socket.io)](https://socket.io)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose_8-green?logo=mongodb)](https://www.mongodb.com)
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 Meetrix is a production-ready, full-stack video conferencing web application built on the **MERN stack** (MongoDB, Express, React, Node.js). It enables real-time peer-to-peer audio/video communication via **WebRTC**, coordinated through a **Socket.IO** signaling server, with optional **Firebase** authentication alongside a native JWT-based auth system.
 
