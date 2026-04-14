@@ -5,6 +5,9 @@ const MAX_PARTICIPANTS_PER_ROOM = Math.max(
     Math.min(200, Number.parseInt(process.env.MAX_PARTICIPANTS ?? "10", 10) || 10)
 );
 const MAX_MESSAGES_PER_ROOM = 100;
+const MAX_CHAT_MESSAGE_LENGTH = 2000;
+const MAX_DISPLAY_NAME_LENGTH = 60;
+const ROOM_ID_REGEX = /^[a-zA-Z0-9_-]{1,64}$/;
 
 let connections = {};
 let messages = {};
@@ -27,28 +30,33 @@ export const connectToSocket = (server) => {
         console.log("Connected: ", socket.id);
 
         socket.on("join-call", (path) => {
-            if (connections[path] !== undefined && connections[path].length >= MAX_PARTICIPANTS_PER_ROOM) {
+            const roomId = typeof path === "string" ? path.trim() : "";
+            if (!ROOM_ID_REGEX.test(roomId)) {
+                socket.emit("room-full");
+                return;
+            }
+            if (connections[roomId] !== undefined && connections[roomId].length >= MAX_PARTICIPANTS_PER_ROOM) {
                 socket.emit("room-full");
                 return;
             }
 
-            if (connections[path] === undefined) {
-                connections[path] = [];
+            if (connections[roomId] === undefined) {
+                connections[roomId] = [];
             }
-            connections[path].push(socket.id);
+            connections[roomId].push(socket.id);
             timeOnline[socket.id] = new Date();
 
-            for (let a = 0; a < connections[path].length; a++) {
-                io.to(connections[path][a]).emit("user-joined", socket.id, connections[path]);
+            for (let a = 0; a < connections[roomId].length; a++) {
+                io.to(connections[roomId][a]).emit("user-joined", socket.id, connections[roomId]);
             }
 
-            if (messages[path] !== undefined) {
-                for (let a = 0; a < messages[path].length; a++) {
+            if (messages[roomId] !== undefined) {
+                for (let a = 0; a < messages[roomId].length; a++) {
                     io.to(socket.id).emit(
                         "chat-message",
-                        messages[path][a].data,
-                        messages[path][a].sender,
-                        messages[path][a].socketId
+                        messages[roomId][a].data,
+                        messages[roomId][a].sender,
+                        messages[roomId][a].socketId
                     );
                 }
             }
@@ -59,6 +67,11 @@ export const connectToSocket = (server) => {
         });
 
         socket.on("chat-message", (data, sender) => {
+            const safeMessage = typeof data === "string" ? data.trim().slice(0, MAX_CHAT_MESSAGE_LENGTH) : "";
+            const safeSender = typeof sender === "string" ? sender.trim().slice(0, MAX_DISPLAY_NAME_LENGTH) : "Guest";
+            if (!safeMessage) {
+                return;
+            }
             let key;
             for (const [k, v] of Object.entries(connections)) {
                 if (v.includes(socket.id)) {
@@ -71,13 +84,13 @@ export const connectToSocket = (server) => {
                 if (messages[key] === undefined) {
                     messages[key] = [];
                 }
-                messages[key].push({ sender, data, socketId: socket.id });
+                messages[key].push({ sender: safeSender, data: safeMessage, socketId: socket.id });
                 if (messages[key].length > MAX_MESSAGES_PER_ROOM) {
                     messages[key] = messages[key].slice(-MAX_MESSAGES_PER_ROOM);
                 }
 
                 for (let a = 0; a < connections[key].length; a++) {
-                    io.to(connections[key][a]).emit("chat-message", data, sender, socket.id);
+                    io.to(connections[key][a]).emit("chat-message", safeMessage, safeSender, socket.id);
                 }
             }
         });

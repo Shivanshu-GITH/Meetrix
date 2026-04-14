@@ -124,14 +124,14 @@ const History: React.FC = () => {
                                                 '&:hover': { boxShadow: 4, transform: 'translateY(-2px)' },
                                                 transition: 'all 0.2s'
                                             }}>
-                                                <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 3 }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                                <CardContent sx={{ display: 'flex', alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, p: 3 }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, sm: 3 }, width: '100%' }}>
                                                         <Avatar sx={{ bgcolor: 'rgba(255, 152, 57, 0.1)', color: '#FF9839', width: 50, height: 50 }}>
                                                             <VideocamIcon />
                                                         </Avatar>
                                                         <Box>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                <Typography variant="h6" sx={{ fontWeight: 'bold', fontFamily: 'monospace' }}>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                                                <Typography variant="h6" sx={{ fontWeight: 'bold', fontFamily: 'monospace', wordBreak: 'break-all' }}>
                                                                     {meeting.meetingCode}
                                                                 </Typography>
                                                                 <Tooltip title="Copy Code">
@@ -148,8 +148,9 @@ const History: React.FC = () => {
                                                     <Button 
                                                         variant="contained" 
                                                         size="medium"
+                                                        fullWidth
                                                         onClick={() => handleRejoin(meeting.meetingCode)}
-                                                        sx={{ bgcolor: '#1a1a2e', '&:hover': { bgcolor: '#0f3460' } }}
+                                                        sx={{ bgcolor: '#1a1a2e', '&:hover': { bgcolor: '#0f3460' }, maxWidth: { xs: '100%', sm: '120px' } }}
                                                     >
                                                         Rejoin
                                                     </Button>

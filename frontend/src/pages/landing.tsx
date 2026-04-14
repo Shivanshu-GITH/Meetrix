@@ -41,12 +41,12 @@ const LandingPage: React.FC = () => {
   return (
     <Box className="landingPageContainer">
       {/* Sticky Navbar */}
-      <Box component="nav" className="navBar" sx={{ position: 'sticky', top: 0, zIndex: 1000, height: '65px' }}>
+      <Box component="nav" className="navBar" sx={{ position: 'sticky', top: 0, zIndex: 1000, minHeight: '65px', height: 'auto', py: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <VideocamIcon sx={{ color: '#FF9839', fontSize: 32 }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>Meetrix</Typography>
         </Box>
-        <Box className="navlist">
+        <Box className="navlist" sx={{ flexWrap: 'wrap', justifyContent: 'flex-end', rowGap: 1 }}>
           <Button color="inherit" onClick={handleGuestJoin} sx={{ display: { xs: 'none', md: 'inline-flex' } }}>Join as Guest</Button>
           <Button color="inherit" onClick={() => navigate('/auth')}>Register</Button>
           <Button 
@@ -88,8 +88,8 @@ const LandingPage: React.FC = () => {
                 size="large" 
                 sx={{ 
                   bgcolor: '#FF9839', 
-                  px: 5, 
-                  py: 2, 
+                  px: { xs: 3, sm: 5 }, 
+                  py: 1.6, 
                   fontSize: '1.1rem', 
                   fontWeight: 'bold',
                   borderRadius: '12px',
@@ -105,8 +105,8 @@ const LandingPage: React.FC = () => {
                 sx={{ 
                   color: 'white', 
                   borderColor: 'rgba(255,255,255,0.5)', 
-                  px: 5, 
-                  py: 2, 
+                  px: { xs: 3, sm: 5 }, 
+                  py: 1.6, 
                   fontSize: '1.1rem', 
                   fontWeight: 'bold',
                   borderRadius: '12px',

@@ -2,6 +2,8 @@ import express from 'express';
 import { createServer } from 'node:http';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import helmet from 'helmet';
+import { rateLimit } from 'express-rate-limit';
 import 'dotenv/config';
 import { connectToSocket } from './controllers/socketManager.js';
 import userRoutes from './routes/users.routes.js';
@@ -15,18 +17,35 @@ const skipDb = process.env.SKIP_DB === 'true';
 const app = express();
 const server = createServer(app);
 connectToSocket(server);
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
 
 app.set("port", (process.env.PORT || 8000));
 
-const corsOrigin = process.env.FRONTEND_URL
-    ? process.env.FRONTEND_URL
-    : process.env.NODE_ENV === "production"
-    ? (() => { throw new Error("FRONTEND_URL must be set in production"); })()
-    : true; // dev only
+const frontendUrl = process.env.FRONTEND_URL?.trim();
+const corsOrigin =
+    frontendUrl ||
+    (process.env.NODE_ENV === "production"
+        ? (() => {
+              throw new Error("FRONTEND_URL must be set in production");
+          })()
+        : true);
+
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: Number(process.env.API_RATE_LIMIT) || 300,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    message: { message: "Too many requests, please try again later." },
+});
+
+app.use(helmet());
+app.use(apiLimiter);
 
 app.use(cors({
     origin: corsOrigin,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Authorization']
 }));
@@ -60,7 +79,10 @@ app.use((err, req, res, next) => {
         console.error(err.stack);
     }
     res.status(status).json({
-        message: err.message || "Internal server error",
+        message:
+            status >= 500 && process.env.NODE_ENV === "production"
+                ? "Internal server error"
+                : err.message || "Internal server error",
     });
 });
 
@@ -126,3 +148,12 @@ const start = async () => {
 };
 
 start();
+
+process.on("unhandledRejection", (reason) => {
+    console.error("Unhandled promise rejection:", reason);
+});
+
+process.on("uncaughtException", (error) => {
+    console.error("Uncaught exception:", error);
+    process.exit(1);
+});

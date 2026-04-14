@@ -357,7 +357,7 @@ const VideoMeetComponent: React.FC = () => {
         }
     }, []);
 
-    const connectToSocketServer = (roomId: string) => {
+    const connectToSocketServer = useCallback((roomId: string) => {
         const socket = io(server, {
             transports: ["websocket", "polling"],
             withCredentials: true
@@ -454,12 +454,13 @@ const VideoMeetComponent: React.FC = () => {
             socketIdRef.current = socket.id;
             socket.emit("join-call", roomId);
         });
-    };
+    }, [addMessage, black, gotMessageFromServer, navigate, silence]);
 
     useEffect(() => {
         if (askForUsername || !meetingCode) {
             return undefined;
         }
+        const localVideoEl = localVideoRef.current;
 
         connectToSocketServer(meetingCode);
 
@@ -483,7 +484,7 @@ const VideoMeetComponent: React.FC = () => {
                 socketRef.current = null;
             }
             try {
-                const tracks = localVideoRef.current?.srcObject instanceof MediaStream ? localVideoRef.current?.srcObject?.getTracks() : [];
+                const tracks = localVideoEl?.srcObject instanceof MediaStream ? localVideoEl.srcObject.getTracks() : [];
                 tracks?.forEach((t) => t.stop());
             } catch {
                 /* ignore */
@@ -500,7 +501,7 @@ const VideoMeetComponent: React.FC = () => {
             audioCtxRef.current = null;
         };
         // Intentionally only room/session gates: socket handlers read refs / stable callbacks.
-    }, [askForUsername, meetingCode]);
+    }, [askForUsername, connectToSocketServer, meetingCode]);
 
     const sendMessage = () => {
         if (!message.trim() || !socketRef.current) return;

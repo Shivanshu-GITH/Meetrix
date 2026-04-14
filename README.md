@@ -74,7 +74,33 @@ A full-stack MERN (MongoDB, Express, React, Node.js) video conferencing applicat
 | `MONGO_URI` | MongoDB connection string | - |
 | `PORT` | Backend server port | 8000 |
 | `JWT_SECRET` | Secret key for JWT signing | - |
+| `JWT_ISSUER` | JWT issuer claim | `meetrix-api` |
+| `JWT_AUDIENCE` | JWT audience claim | `meetrix-client` |
 | `FRONTEND_URL` | URL of the frontend app (for CORS) | http://localhost:5173 |
+| `API_RATE_LIMIT` | Global API requests per 15 minutes | `300` |
+
+## 🛡️ Production Hardening Included
+
+- Helmet-based secure HTTP headers enabled.
+- Strict CORS in production via `FRONTEND_URL`.
+- Auth and API route rate limiting.
+- JWT verification with issuer/audience + HS256 algorithm enforcement.
+- Safer auth errors (prevents user enumeration and internal error leakage).
+- Socket room/chat payload validation and message length limits.
+- Firebase auth support (Google + email/password + password reset).
+
+## ✅ Production Checklist
+
+1. Set strong secrets in backend `.env`:
+   - `JWT_SECRET` (long random value)
+   - `JWT_ISSUER`
+   - `JWT_AUDIENCE`
+2. Set `FRONTEND_URL` to your deployed frontend URL.
+3. Configure frontend `.env.local` with all Firebase `VITE_FIREBASE_*` values.
+4. Run:
+   - `cd backend && npm start`
+   - `cd frontend && npm run build`
+5. Deploy behind HTTPS (required for secure media features and OAuth reliability).
 
 ## 📸 Screenshots
 

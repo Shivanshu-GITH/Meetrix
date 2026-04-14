@@ -25,6 +25,7 @@ const withAuth = <P extends WithAuthProps>(WrappedComponent: React.ComponentType
         useEffect(() => {
             const checkAuth = () => {
                 const token = localStorage.getItem("token");
+                const provider = localStorage.getItem("authProvider");
                 const ok = Boolean(token && token !== "" && token !== "undefined");
                 if (!ok) {
                     router("/auth");
@@ -32,7 +33,7 @@ const withAuth = <P extends WithAuthProps>(WrappedComponent: React.ComponentType
                     setChecked(true);
                     return;
                 }
-                if (isTokenExpired(token!)) {
+                if (provider !== "firebase" && isTokenExpired(token!)) {
                     localStorage.removeItem("token");
                     localStorage.removeItem("username");
                     localStorage.removeItem("name");

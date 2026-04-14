@@ -73,7 +73,7 @@ const HomeComponent: React.FC = () => {
     return (
         <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             {/* Navbar */}
-            <Box component="nav" className="navBar" sx={{ position: 'sticky', top: 0, zIndex: 1000, height: '70px' }}>
+            <Box component="nav" className="navBar" sx={{ position: 'sticky', top: 0, zIndex: 1000, minHeight: '70px', height: 'auto', py: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <VideoCallIcon sx={{ color: '#FF9839', fontSize: 32 }} />
                     <Typography variant="h5" sx={{ fontWeight: 'bold' }}>Meetrix</Typography>
@@ -94,7 +94,7 @@ const HomeComponent: React.FC = () => {
                         onClick={logout}
                         sx={{ borderColor: 'rgba(255,255,255,0.3)', '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' } }}
                     >
-                        Logout
+                        <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Logout</Box>
                     </Button>
                 </Box>
             </Box>
@@ -135,8 +135,9 @@ const HomeComponent: React.FC = () => {
                                     <Button 
                                         variant="contained" 
                                         onClick={handleJoinMeeting}
+                                        fullWidth
                                         sx={{ 
-                                            px: 4, 
+                                            px: { xs: 2, sm: 4 }, 
                                             py: { xs: 1.5, sm: 0 },
                                             bgcolor: '#1a1a2e', 
                                             borderRadius: '12px',
